@@ -1,0 +1,19 @@
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Import GPG key for WezTerm repository
+      apt_key:
+        url: https://apt.fury.io/wez/gpg.key
+        state: present
+
+    - name: Add WezTerm repository
+      apt_repository:
+        repo: 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *'
+        state: present
+        filename: 'wezterm'
+
+    - name: Update apt package cache and install WezTerm package
+      apt:
+        name: wezterm
+        state: present
+        update_cache: yes

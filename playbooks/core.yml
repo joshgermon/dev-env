@@ -61,22 +61,22 @@
     register: ohmyzsh_result
     failed_when: "'FAILED' in ohmyzsh_result.stderr"
 
-  # - name: Install zsh-syntax-highlighting plugin # latest[git]
-  #   ansible.builtin.git:
-  #     repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
-  #     dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-  #
-  # - name: Install zsh-autosuggestions plugin # latest[git]
-  #   ansible.builtin.git:
-  #     repo: https://github.com/zsh-users/zsh-autosuggestions
-  #     dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-  #
-  # - name: Install zsh-completions plugin # latest[git]
-  #   ansible.builtin.git:
-  #     repo: https://github.com/zsh-users/zsh-completions
-  #     dest: ~/.oh-my-zsh/custom/plugins/zsh-completions
+  - name: Install zsh-syntax-highlighting plugin # latest[git]
+    ansible.builtin.git:
+      repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+      dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 
-  - name: Copy dev env
+  - name: Install zsh-autosuggestions plugin # latest[git]
+    ansible.builtin.git:
+      repo: https://github.com/zsh-users/zsh-autosuggestions
+      dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+  - name: Install zsh-completions plugin # latest[git]
+    ansible.builtin.git:
+      repo: https://github.com/zsh-users/zsh-completions
+      dest: ~/.oh-my-zsh/custom/plugins/zsh-completions
+
+  - name: Copy dev env dotfiles
     ansible.builtin.copy:
       src: ../env/
       dest: "{{ home }}"
@@ -84,3 +84,10 @@
       group: "{{ username }}"
       mode: '0755'
 
+  - name: Copy local scripts
+    ansible.builtin.copy:
+      src: ../scripts/
+      dest: "{{ local_scripts }}"
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: '0755'
