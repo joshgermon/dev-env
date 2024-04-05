@@ -1,0 +1,24 @@
+- hosts: localhost
+  gather_facts: true
+  become: true
+  become_user: "{{ lookup('env', 'USER') }}"
+
+  vars:
+    user: "{{ ansible_user_id }}"
+    node_version: v21
+  tasks:
+  - name: Download Installer
+    get_url:
+      url: https://fnm.vercel.app/install
+      dest: /tmp/fnm-install.sh
+      mode: '0755'
+      force: 'yes'
+
+  - name: install fnm
+    shell: /tmp/fnm-install.sh --skip-shell
+
+  - name: install node with fnm
+    become: true
+    command: fnm install {{ node_version }}
+
+

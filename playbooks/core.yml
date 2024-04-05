@@ -1,6 +1,5 @@
 - hosts: localhost
   tasks:
-
   - name: Include main vars
     ansible.builtin.include_vars:
       file: vars.yml
@@ -13,8 +12,6 @@
         - curl
         - rsync
         - build-essential
-        - docker
-        - docker-compose
         - tmux
         - python3-pip
         - python3-venv
@@ -26,19 +23,6 @@
         - unzip
         - bat
       state: present
-
-  - name: Ensure group "docker" exists with correct gid
-    become: true
-    ansible.builtin.group:
-      name: docker
-      state: present
-
-  - name: Add user to docker group
-    become: true
-    ansible.builtin.user:
-      name: "{{ username }}"
-      groups: docker
-      append: true
 
   - name: user.name for git config
     become_user: "{{ username }}"
@@ -55,65 +39,42 @@
       value: "{{ email }}"
 
   - name: Install desktop applications
+    become: true
     package:
       name:
         - firefox
-        - spotify-client
-        - discord
       state: present
 
-  - name: Install Rust
-    command: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    tags: language_tools
-
-  - name: Install fnm (node version manager)
-    command: curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "./.fnm" --skip-shell
-    tags: language_tools
-  
-  # ZSH and Oh my ZSH setup
-  - name: Install oh my zsh # latest[git]
-    ansible.builtin.git:
-      repo: "https://github.com/ohmyzsh/ohmyzsh.git"
-      dest: ~/.oh-my-zsh
-      force: true
-      depth: 1
-
-  - name: Install zoxide
-    command: curl -fsSL https://github.com/Schniz/fnm/raw/master/.ci/install.sh | bash
-    tags: extra
-
-  - name: Change user shell to zsh 
-    become: true
-    ansible.builtin.user:
+  - name: Ensure zsh is the default shell
+    user:
       name: "{{ ansible_user_id }}"
-      shell: /bin/zsh
+      shell: "/usr/bin/zsh"
+    become: true
 
-  - name: Remove any existing directory before installing omz
-    ansible.builtin.file:
-      path: ~/.oh-my-zsh
-      state: absent
+  - name: Download Oh My Zsh installation script
+    get_url:
+      url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+      dest: /tmp/install_ohmyzsh.sh
 
-  - name: Install oh my zsh # latest[git]
-    ansible.builtin.git:
-      repo: "https://github.com/ohmyzsh/ohmyzsh.git"
-      dest: ~/.oh-my-zsh
-      force: true
-      depth: 1
+  - name: Run Oh My Zsh installation script
+    command: sh /tmp/install_ohmyzsh.sh --unattended
+    register: ohmyzsh_result
+    failed_when: "'FAILED' in ohmyzsh_result.stderr"
 
-  - name: Install zsh-syntax-highlighting plugin # latest[git]
-    ansible.builtin.git:
-      repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
-      dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-
-  - name: Install zsh-autosuggestions plugin # latest[git]
-    ansible.builtin.git:
-      repo: https://github.com/zsh-users/zsh-autosuggestions
-      dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-
-  - name: Install zsh-completions plugin # latest[git]
-    ansible.builtin.git:
-      repo: https://github.com/zsh-users/zsh-completions
-      dest: ~/.oh-my-zsh/custom/plugins/zsh-completions
+  # - name: Install zsh-syntax-highlighting plugin # latest[git]
+  #   ansible.builtin.git:
+  #     repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+  #     dest: ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+  #
+  # - name: Install zsh-autosuggestions plugin # latest[git]
+  #   ansible.builtin.git:
+  #     repo: https://github.com/zsh-users/zsh-autosuggestions
+  #     dest: ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+  #
+  # - name: Install zsh-completions plugin # latest[git]
+  #   ansible.builtin.git:
+  #     repo: https://github.com/zsh-users/zsh-completions
+  #     dest: ~/.oh-my-zsh/custom/plugins/zsh-completions
 
   - name: Copy dev env
     ansible.builtin.copy:
@@ -122,3 +83,4 @@
       owner: "{{ username }}"
       group: "{{ username }}"
       mode: '0755'
+

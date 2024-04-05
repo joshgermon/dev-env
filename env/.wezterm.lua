@@ -5,11 +5,11 @@ local wezterm = require 'wezterm'
 local config = {}
 
 -- Start maximised
-local mux = wezterm.mux
-wezterm.on('gui-startup', function(cmd)
-  local tab, pane, window = mux.spawn_window(cmd or {})
-  window:gui_window():maximize()
-end)
+-- local mux = wezterm.mux
+-- wezterm.on('gui-startup', function(cmd)
+--   local tab, pane, window = mux.spawn_window(cmd or {})
+--   window:gui_window():maximize()
+-- end)
 
 -- In newer versions of wezterm, use the config_builder which will
 -- help provide clearer error messages
@@ -41,7 +41,7 @@ config.font_size = 18
 config.line_height = 1.1
 
 -- Sets profile as WSL
-config.default_domain = 'WSL:Ubuntu'
+-- config.default_domain = 'WSL:Ubuntu'
 
 -- and finally, return the configuration to wezterm
 return config
