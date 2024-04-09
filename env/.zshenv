@@ -10,3 +10,5 @@ fi
 
 # tmux projects
 bindkey -s ^f "tmux-sessionizer\n"
+
+. "$HOME/.cargo/env"

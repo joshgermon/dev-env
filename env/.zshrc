@@ -73,3 +73,7 @@ alias vim="nvim"
 
 # GO path
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+
+# fnm
+export PATH="/home/joshua/.local/share/fnm:$PATH"
+eval "`fnm env`"
